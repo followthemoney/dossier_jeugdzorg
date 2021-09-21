@@ -6,7 +6,7 @@
 
 Sinds eind 2019 doet Follow the Money in samenwerking met enkele regionale nieuwsredacties onderzoek naar geldstromen in de Jeugdzorg. De sector zegt met grote tekorten te kampen sinds gemeenten verantwoordelijk zijn geworden voor de financiering. Een goed overzicht van geldstromen ontbreekt echter. De afgelopen anderhalf jaar heeft een team van redacteuren geprobeerd om die geldstromen in kaart te brengen. Dat is deels gelukt. Enerzijds is het niet gelukt om alle gemeenten ertoe te bewegen inzage te verschaffen over deze geldstromen. Anderzijds is het wel gelukt om verreweg de grootste dataset van geldstromen in de Jeugdzorg samen te stellen. 
 
-Met deze repository geven we deze data vrij. We hopen dat anderen met deze aan de slag gaan en horen uiteraard welke bevindingen u doet. We vinden het leuk als u ons daarvan op de hoogte houdt. Mocht u de data herpubliceren, dan worden we graag als bron genoemd. Voor vragen en/of overleg kunt u terecht bij Tom Claessens, tom punt claessens at ftm punt nl. 
+Met deze repository geven we deze data vrij. We hopen dat anderen met deze aan de slag gaan en horen uiteraard welke bevindingen u doet. We vinden het leuk als u ons daarvan op de hoogte houdt. Mocht u de data herpubliceren, dan worden we graag als bron genoemd. Voor vragen en/of overleg kunt u terecht bij Tom Claessens, tom.claessens@ftm.nl. 
 
 ## Verhalen
 Op basis van deze data zijn recentelijk enkele verhalen gepubliceerd:
