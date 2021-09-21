@@ -26,7 +26,7 @@ Enkele andere verhalen in dit dossier:
 
 Deze data zijn een herpublicatie van gegevens van [Jaarverantwoording Zorg](https://www.jaarverantwoordingzorg.nl/]), waar zorgaanbieders hun financiën verantwoorden aan het ministerie van Volksgezondheid, Welzijn en Sport (VWS). 
 
-De cijfers hierin zijn ingevuld door zorgaanbieders zelf. Dit kan desondanks betekenen dat er cijfers niet kloppen. Wij zijn er in ons onderzoek een enkele keer op gestuit dat we deze cijfers hebben voorgelegd aan zorgaanbieders zelf en daarbij te horen kregen dat er fouten bestonden. Ook komt het voor dat zorgaanbieders niet alle data hebben ingevuld. Sowieso hoeven kleine zorgaanbieders minder te verantwoorden dan grote zorgaanbieders.
+De cijfers hierin zijn ingevuld door zorgaanbieders zelf. Dit kan desondanks betekenen dat er cijfers niet kloppen. Wij zijn er in ons onderzoek meerdere keren op gestuit dat we deze cijfers hebben voorgelegd aan zorgaanbieders zelf en daarbij te horen kregen dat er fouten bestonden. Ook komt het voor dat zorgaanbieders niet alle data hebben ingevuld. Sowieso hoeven kleine zorgaanbieders minder te verantwoorden dan grote zorgaanbieders.
 
 Follow the Money deed onderzoek naar de financiën van jeugdzorgaanbieders en gebruikte daarbij cijfers uit de jaren 2017 tot en met 2019. Hiervoor werden de beschikbare datasets van [2018](https://github.com/ftmnl/dossier_jeugdzorg/tree/main/data/2018) en [2019](https://github.com/ftmnl/dossier_jeugdzorg/tree/main/data/2019) gebruikt. Omdat in deze sheets zowel de cijfers van het betreffende verslagjaar als het vorige verslagjaar staan, konden we ook 2017 meenemen. Oudere datasets missen dermate veel zorgaanbieders uit de periode erna dat een goede vergelijking met eerdere jaren niet betrouwbaar is.
 
