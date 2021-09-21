@@ -1,0 +1,178 @@
+---
+title: "Jeugdzorg_FTM"
+author: "Tom Claessens"
+output: "Samenvatting financiële cijfers jeugdzorgaanbieders"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(tidyverse)
+library(readxl)
+library(knitr)
+library(DT)
+library(ggplot2)
+library(rvest)   
+library(polite)  
+library(dplyr)   
+library(tidyr)   
+library(purrr)   
+library(stringr) 
+library(glue)    
+library(rlang)   
+library(sjmisc)
+library(tidyverse)
+library(stringr)
+library(openxlsx)
+library(data.table)
+library(stringdist)
+library(tidystringdist)
+```
+
+# Inladen jaarrekeningen
+
+```{r cars}
+# selectie informatie voor onderzoek Follow the Money
+kolomdata_2019 <- read_excel("data/Kolomkeuze.xlsx", sheet = "dmv2019")
+kolomdata_2018 <- read_excel("data/Kolomkeuze.xlsx", sheet = "dmv2018")
+
+#voorbewerken, ziekenhuizen typeren
+entities_2019 <- read_excel("data/2019/XLSX/X9ent_total.xlsx", sheet = "x9ent_total_1") %>%
+  select(ConcernCode, ent_RechtsVorm_ent_RechtsVorm,`ent_Typering_ent_Typering#0`,`ent_Typering_ent_Typering#2`,`ent_Typering_ent_Typering#3`) 
+digimv_2019 <- read_excel("data/2019/XLSX/X9conc_total_1.xlsx", sheet = "x9conc_total_1") %>%
+  select(ConcernCode) %>% 
+  left_join(entities_2019)
+digimv_2019[is.na(digimv_2019)] <- 0
+cols.num <- c( "ent_Typering_ent_Typering#0","ent_Typering_ent_Typering#2","ent_Typering_ent_Typering#3")
+digimv_2019[cols.num] <- sapply(digimv_2019[cols.num], as.numeric)
+digimv_2019 <- digimv_2019 %>%
+  mutate(isziekenhuis = ifelse(`ent_Typering_ent_Typering#0`+`ent_Typering_ent_Typering#2`+`ent_Typering_ent_Typering#3`>0,1,0)) %>%
+  select(ConcernCode,ent_RechtsVorm_ent_RechtsVorm,isziekenhuis)
+
+entities_2018 <- read_excel("data/2018/XLSX/x8ent_total.xlsx", sheet = "x8ent_total_1") %>%
+  select(ConcernCode, ent_RechtsVorm_ent_RechtsVorm,`ent_Typering_ent_Typering#0`,`ent_Typering_ent_Typering#2`,`ent_Typering_ent_Typering#3`)
+digimv_2018 <- read_excel("data/2018/XLSX/x8conc_total.xlsx", sheet = "x8conc_total_1") %>%
+  select(ConcernCode) %>% 
+  left_join(entities_2018)
+digimv_2018[is.na(digimv_2018)] <- 0
+digimv_2018[cols.num] <- sapply(digimv_2018[cols.num], as.numeric)
+digimv_2018 <- digimv_2018 %>%
+  mutate(isziekenhuis = ifelse(`ent_Typering_ent_Typering#0`+`ent_Typering_ent_Typering#2`+`ent_Typering_ent_Typering#3`>0,1,0)) %>%
+  select(ConcernCode,ent_RechtsVorm_ent_RechtsVorm,isziekenhuis)
+
+
+#inladen alle data van 2019
+for (i in 1:length(kolomdata_2019$Tabblad)) {
+  check <- as.numeric(gsub("x9conc_total_","",kolomdata_2019$Tabblad[i]))
+  if (check < 14) {
+    kolom <- read_excel("data/2019/XLSX/x9conc_total_1.xlsx",sheet = kolomdata_2019$Tabblad[i]) %>% 
+      select(ConcernCode,kolomdata_2019$Variable[i])
+    digimv_2019 <- digimv_2019 %>% full_join(kolom)
+  } else {
+    kolom <- read_excel("data/2019/XLSX/x9conc_total_2.xlsx",sheet = kolomdata_2019$Tabblad[i]) %>% 
+      select(ConcernCode,kolomdata_2019$Variable[i])
+    digimv_2019 <- digimv_2019 %>% full_join(kolom)
+  }
+  print(i)
+}
+
+#idem voor 2018
+for (i in 1:length(kolomdata_2018$Tabblad)) {
+  kolom <- read_excel("data/2018/XLSX/x8conc_total.xlsx",sheet = kolomdata_2018$Tabblad[i]) %>% 
+    select(ConcernCode,kolomdata_2018$Variable[i])
+  digimv_2018 <- digimv_2018 %>% full_join(kolom)
+  print(i)
+}
+
+digimv_2019$jaar <- 2019
+digimv_2018$jaar <- 2018
+digimv_totaal <- digimv_2019 %>% bind_rows(digimv_2018)
+
+jeugdzorgbedrijven <- digimv_totaal %>% 
+  filter(AS_JZ == "is wel aanschrijfreden"| jeuRopbr170_Micro_jeuRopbr170_Micro != 0| jeuRopbr170_Micro_jeuRopbr171_Micro != 0| jeuRopbr_30_jeuRopbr_301 != 0| jeuRopbr_30_jeuRopbr_302 != 0)
+jeugdzorgbedrijven[is.na(jeugdzorgbedrijven)] <- 0
+
+```
+
+# Ontwikkelen van sheet met belangrijkste financiële gegevens
+
+```{r pressure, echo=FALSE}
+financien_2019_2018 <- jeugdzorgbedrijven %>%
+  mutate(Bedrijfsresultaat = jeu11210_Micro_jeu11210_Micro + jeu11210_jeu11210,
+         Nettowinst = jeu11520_Micro_jeu11520_Micro + jeu11520_jeu11520,
+         omzet_jeugdwet = jeuRopbr170_Micro_jeuRopbr170_Micro + jeuRopbr_30_jeuRopbr_301,
+         omzet_totaal = jeu10800_Micro_jeu10800_Micro + jeu10800_jeu10800,
+         eigen_vermogen = jeu09700_jeu09700 + jeu09700_Micro_jeu09700_Micro,
+         totaal_passiva = jeu10300_jeu10300 + jeu10300_Micro_jeu10300_Micro,
+         vlot_act = jeu09200_jeu09200 + jeu09300_Micro_jeu09300_Micro - jeu08300_Micro_jeu08300_Micro,
+         liq_mid = jeu09100_jeu09100 + jeu09100_Micro_jeu09100_Micro,
+         pers_kost_tot = jeu13251_Micro_jeu13252_Micro + jeu13251_jeu13251,
+         kort_schulden = jeu10210_jeu10210+jz_jeuD1_schuldsubs_jz_jeuD1_schuldsubs+jeu10200_schuldover_jeu10200_schuldover,
+         jeugdwet_clienten = qap10112uniek_qap10112uniek*qPercPatCliJeugdwet_qPercPatCliJeugdwet/100,
+         kosten_tot = jeu11200_Micro_jeu11200_Micro + jeu11200_jeu11200) %>%
+  distinct(ConcernCode,jaar,.keep_all = T) %>%
+  select(ConcernCode,ent_RechtsVorm_ent_RechtsVorm,c_naam,jaar,omzet_jeugdwet,omzet_totaal,eigen_vermogen,totaal_passiva,vlot_act,liq_mid,pers_kost_tot,
+         kort_schulden,Bedrijfsresultaat,Nettowinst,jeugdwet_clienten,kosten_tot,qPersVerloopTot_InstroomFte,qPersVerloopTot_UitstroomFte,qPersTotTot_AantalFte) %>%
+  mutate(percentage_omzet_uit_jeugdwet = omzet_jeugdwet/omzet_totaal,
+         current_ratio = vlot_act/kort_schulden,solvabiliteit = eigen_vermogen/totaal_passiva,
+         Weerstand = eigen_vermogen/omzet_totaal,
+         Vermogen_boven_15procent = eigen_vermogen-0.15*omzet_totaal,
+         percentage_bedrijfsresultaat = Bedrijfsresultaat/omzet_totaal,
+         percentage_nettowinst = Nettowinst/omzet_totaal,
+         percentage_personeelskosten = pers_kost_tot/omzet_totaal) %>%
+  arrange(ConcernCode)
+
+# We maken gebruik van de meest recente financiële gegevens, dus we moeten de concerncodes die in 2019 staan opgegeven niet meenemen uit de jaarverantwoording zorg sheet van 2018
+filter_dubbel <- financien_2019_2018 %>%
+  filter(jaar == 2018) %>%
+  select(ConcernCode)
+
+financien_2018_2017 <- jeugdzorgbedrijven %>%
+  mutate(Bedrijfsresultaat = jeu11210_Micro_jeu11211_Micro + jeu11210_jeu11211,
+               Nettowinst = jeu11520_Micro_jeu11521_Micro + jeu11520_jeu11521,
+               omzet_jeugdwet = jeuRopbr170_Micro_jeuRopbr171_Micro + jeuRopbr_30_jeuRopbr_302,
+               omzet_totaal = jeu10800_Micro_jeu10801_Micro + jeu10800_jeu10801,
+               eigen_vermogen = jeu09700_jeu09701 + jeu09700_Micro_jeu09701_Micro,
+               totaal_passiva = jeu10300_jeu10301 + jeu10300_Micro_jeu10301_Micro,
+               vlot_act = jeu09200_jeu09201 + jeu09300_Micro_jeu09301_Micro - jeu08300_Micro_jeu08301_Micro,
+               liq_mid = jeu09100_jeu09101 + jeu09100_Micro_jeu09101_Micro,
+               pers_kost_tot = jeu13251_Micro_jeu13252_Micro + jeu13251_jeu13252,
+               kort_schulden = jeu10210_jeu10211+jz_jeuD1_schuldsubs_jz_jeuD1_schuldsubs_2+jeu10200_schuldover_jeu10200_schuldover_1,
+               kosten_tot = jeu11200_Micro_jeu11201_Micro + jeu11200_jeu11201) %>%
+  distinct(ConcernCode,jaar,.keep_all = T) %>%
+  select(ConcernCode,ent_RechtsVorm_ent_RechtsVorm,c_naam,jaar,omzet_jeugdwet,omzet_totaal,eigen_vermogen,totaal_passiva,vlot_act,liq_mid,pers_kost_tot,
+         kort_schulden,Bedrijfsresultaat,Nettowinst,kosten_tot,qPersVerloopTot_InstroomFte,qPersVerloopTot_UitstroomFte,qPersTotTot_AantalFte) %>%
+  mutate(percentage_omzet_uit_jeugdwet = omzet_jeugdwet/omzet_totaal,
+         current_ratio = vlot_act/kort_schulden,solvabiliteit = eigen_vermogen/totaal_passiva,
+         Weerstand = eigen_vermogen/omzet_totaal,
+         Vermogen_boven_15procent = eigen_vermogen-0.15*omzet_totaal,
+         percentage_bedrijfsresultaat = Bedrijfsresultaat/omzet_totaal,
+         percentage_nettowinst = Nettowinst/omzet_totaal,
+         percentage_personeelskosten = pers_kost_tot/omzet_totaal,
+         jaar = jaar - 1) %>%
+  arrange(ConcernCode) 
+
+# overhouden bedrijven in 2018 die niet al in de digimvsheet van 2019 staan
+financien_2018_2 <- financien_2018_2017 %>%
+  filter(jaar == 2018) %>%
+  filter(!ConcernCode %in% filter_dubbel$ConcernCode)
+  
+# cijfers van 2017
+financien_2017 <- financien_2018_2017 %>%
+  filter(jaar == 2017)
+
+# definieren concerncodes van bedrijven die in één van de jaren een percentage omzet uit jeugdwet van boven de 30% hebben
+bedrijven_criteria_voldaan <- financien_2019_2018 %>%
+  bind_rows(financien_2018_2) %>%
+  bind_rows(financien_2017) %>%
+  filter(percentage_omzet_uit_jeugdwet >= 0.3) %>%
+  distinct(ConcernCode)
+
+# alle data van bedrijven die aan deze criteria voldoen
+financien_bedrijven <- financien_2019_2018 %>%
+  bind_rows(financien_2018_2) %>%
+  bind_rows(financien_2017) %>%
+  filter(ConcernCode %in% bedrijven_criteria_voldaan$ConcernCode)
+
+write.xlsx(financien_bedrijven,"financielecijfers_jeugdzorgaanbieders_onderzoek_ftm.xlsx")
+```
+
