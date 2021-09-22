@@ -12,7 +12,7 @@ Met deze repository geven we deze data vrij. We hopen dat anderen met deze aan d
 Op basis van deze data zijn recentelijk enkele verhalen gepubliceerd:
 * [Geldstromen in de Jeugdzorg voor het eerst inzichtelijk na groot data-onderzoek Follow the Money](https://www.ftm.nl/artikelen/jeugdzorg-waar-bleven-de-miljarden?utm_campaign=Dimitri-Tokmetzis&utm_source=article&utm_medium=link&share=H2qmGTWi8KfrconaL2L3G4OAXhQ0PW597gWbCcHiGpwh%2BMiVqL4zpWbQSrSNgzo%3D). 
 * [Bestuurders jeugdzorg aan het woord: ‘Gemeenten hebben tekorten over zichzelf afgeroepen'](https://www.ftm.nl/artikelen/jeugdzorg-waar-bleven-de-miljarden-2?utm_campaign=Dimitri-Tokmetzis&utm_source=article&utm_medium=link&share=v%2FI3svsgIOKN9HTXGYdnihjgdYBcfWhxpdxmpL07PvNxJF4kcljoPJCiLTCG4tg%3D)
-* VERANTWOORDING
+* [De data achter de geldstromen](https://www.ftm.nl/artikelen/jeugdzorginhetrood-de-onderzoeksverantwoording?utm_campaign=Dimitri-Tokmetzis&utm_source=article&utm_medium=link&share=KytMHTEm0vZgbagiAzXJqy6jPYUIlTYvTCc72wDFFnlwx2CnT%2BC04DHbCQWiaBA%3D)
 
 Enkele andere verhalen in dit dossier:
 * [Ineens staat er een pleegkind op de stoep](https://www.ftm.nl/artikelen/pleegmoeder-tegen-wil-en-dank?utm_campaign=Dimitri-Tokmetzis&utm_source=article&utm_medium=link&share=34uEtsuCYkxHXmS5WPntJSTyGf1hSjBugyVLInhpram%2FM%2BhnDg7AlaIvzGya1Ao%3D)
